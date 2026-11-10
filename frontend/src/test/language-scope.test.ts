@@ -1,62 +1,37 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-describe('subscription language scope', () => {
+describe('English-only language support', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     vi.unstubAllGlobals();
   });
 
-  it('initializes lazily and changes the subscription language without changing the panel', async () => {
+  it('keeps panel and subscription language English regardless of browser preference', async () => {
     vi.resetModules();
     const utils = await import('@/utils');
-    const cookies = new Map<string, string>([['lang', 'en-US']]);
+    const cookies = new Map<string, string>([['lang', 'fa-IR']]);
     vi.spyOn(utils.CookieManager, 'getCookie').mockImplementation(
       (name) => cookies.get(name) ?? '',
     );
     vi.spyOn(utils.CookieManager, 'setCookie').mockImplementation((name, value) => {
       cookies.set(name, value);
     });
-    const getLanguage = vi.spyOn(utils.LanguageManager, 'getLanguage');
     const reload = vi.fn();
-    vi.stubGlobal('window', { navigator: { language: 'en-US' }, location: { reload } });
+    vi.stubGlobal('window', { navigator: { language: 'fa-IR' }, location: { reload } });
     vi.stubGlobal('document', { documentElement: {} });
 
-    const { readyI18n } = await import('@/i18n/react');
-    expect(getLanguage).not.toHaveBeenCalled();
-
-    await readyI18n('subscription');
+    expect(utils.LanguageManager.getLanguage()).toBe('en-US');
+    expect(utils.LanguageManager.getLanguage('subscription')).toBe('en-US');
+    expect(cookies.get('lang')).toBe('en-US');
     expect(cookies.get('subLang')).toBe('en-US');
 
+    const { readyI18n } = await import('@/i18n/react');
+    await readyI18n('subscription');
+    expect(document.documentElement.lang).toBe('en-US');
+
     utils.LanguageManager.setLanguage('fa-IR', 'subscription');
-    expect(cookies.get('lang')).toBe('en-US');
-    expect(cookies.get('subLang')).toBe('fa-IR');
+    expect(cookies.get('subLang')).toBe('en-US');
     expect(reload).toHaveBeenCalledOnce();
-
-    const dateTimeFormat = vi.spyOn(Intl, 'DateTimeFormat').mockImplementation(function (
-      locale?: Intl.LocalesArgument,
-    ) {
-      return { format: () => String(locale) } as Intl.DateTimeFormat;
-    } as typeof Intl.DateTimeFormat);
-    expect(utils.IntlUtil.formatDate(0, 'gregorian', 'fa-IR')).toBe('fa-IR');
-    expect(dateTimeFormat).toHaveBeenLastCalledWith('fa-IR', expect.any(Object));
-  });
-
-  it('maps a Slovak browser to the Slovak panel locale instead of resetting to English', async () => {
-    vi.resetModules();
-    const utils = await import('@/utils');
-    const cookies = new Map<string, string>();
-    vi.spyOn(utils.CookieManager, 'getCookie').mockImplementation(
-      (name) => cookies.get(name) ?? '',
-    );
-    vi.spyOn(utils.CookieManager, 'setCookie').mockImplementation((name, value) => {
-      cookies.set(name, value);
-    });
-    const reload = vi.fn();
-    vi.stubGlobal('window', { navigator: { language: 'sk' }, location: { reload } });
-
-    expect(utils.LanguageManager.getLanguage()).toBe('sk-SK');
-    expect(cookies.get('lang')).toBe('sk-SK');
-    expect(reload).not.toHaveBeenCalled();
   });
 
   it('does not resolve the language for empty or invalid dates', async () => {
