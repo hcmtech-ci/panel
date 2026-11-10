@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Alert, Card, ConfigProvider, Layout, Tabs, message } from 'antd';
 import type { TabsProps } from 'antd';
@@ -10,7 +10,7 @@ import {
   UnorderedListOutlined,
 } from '@ant-design/icons';
 
-import { ClipboardManager, LanguageManager } from '@/utils';
+import { ClipboardManager } from '@/utils';
 import { setMessageInstance } from '@/utils/messageBus';
 import { useTheme } from '@/hooks/useTheme';
 import SubAppsTab from './SubAppsTab';
@@ -58,7 +58,6 @@ const heroData = {
 
 const apps = buildSubApps({ subUrl, sId, subTitle });
 const initialPlatform = detectPlatform(navigator.userAgent);
-const RTL_LANGUAGES = new Set(['fa-IR', 'ar-EG']);
 
 export default function SubPage() {
   const { t } = useTranslation();
@@ -67,12 +66,7 @@ export default function SubPage() {
   useEffect(() => {
     setMessageInstance(messageApi);
   }, [messageApi]);
-  const [lang, setLang] = useState<string>(() => LanguageManager.getLanguage('subscription'));
-
-  const onLangChange = useCallback((next: string) => {
-    setLang(next);
-    LanguageManager.setLanguage(next, 'subscription');
-  }, []);
+  const lang = 'en-US';
 
   const copy = useCallback(
     async (value: string, toast?: string) => {
@@ -128,7 +122,7 @@ export default function SubPage() {
     return items;
   }, [t, copy, open]);
 
-  const direction = RTL_LANGUAGES.has(lang) ? 'rtl' : 'ltr';
+  const direction = 'ltr';
   const pageClass = ['subscription-page', isDark && 'is-dark', isUltra && 'is-ultra']
     .filter(Boolean)
     .join(' ');
@@ -143,8 +137,6 @@ export default function SubPage() {
               title={subTitle}
               sId={sId}
               email={clientEmail}
-              lang={lang}
-              onLangChange={onLangChange}
             />
             {announce && <Alert type="info" showIcon title={announce} className="sub-announce" />}
             <SubHero {...heroData} lang={lang} />
