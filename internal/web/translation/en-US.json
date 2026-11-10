@@ -1582,8 +1582,6 @@
       "intervals": "Intervals",
       "information": "Information",
       "profile": "Profile",
-      "language": "Language",
-      "telegramBotLanguage": "Telegram Bot Language",
       "security": {
         "admin": "Admin credentials",
         "twoFactor": "Two-factor authentication",
@@ -1891,7 +1889,6 @@
       "discordBotNotEnabled": "Discord bot is not enabled",
       "discordTestFailed": "Discord test failed",
       "discordTestSuccess": "Test notification sent successfully",
-      "discordBotLanguage": "Discord Bot Language",
       "discordNotifyTime": "Notification Time",
       "discordNotifyTimeDesc": "How often the Discord bot sends periodic reports. Pick a preset interval, or choose Custom to enter a raw crontab expression.",
       "discordNotifyBackup": "Database Backup",
