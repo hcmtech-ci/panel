@@ -873,6 +873,12 @@ export class ColorUtils {
   }
 }
 
+export interface SupportedLanguage {
+  name: string;
+  value: string;
+  icon: string;
+}
+
 export type LanguageScope = 'panel' | 'subscription';
 
 const languageCookieNames: Record<LanguageScope, string> = {
@@ -881,6 +887,10 @@ const languageCookieNames: Record<LanguageScope, string> = {
 };
 
 export class LanguageManager {
+  static readonly supportedLanguages: readonly SupportedLanguage[] = [
+    { name: 'English', value: 'en-US', icon: '🇺🇸' },
+  ];
+
   static getLanguage(scope: LanguageScope = 'panel'): string {
     const cookieName = languageCookieNames[scope];
     if (CookieManager.getCookie(cookieName) !== 'en-US') {
